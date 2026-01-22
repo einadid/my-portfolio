@@ -1,25 +1,31 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiGrid, FiCode, FiPenTool } from 'react-icons/fi'
+import { FiGrid, FiCode, FiPenTool, FiChevronRight } from 'react-icons/fi'
 import { projects } from '../../data/projects'
 import ProjectCard from './ProjectCard'
 
-type CategoryFilter = 'all' | 'web' | 'design' | 'both'
+type CategoryFilter = 'all' | 'web' | 'design'
 
 const ProjectsSection = () => {
   const [activeFilter, setActiveFilter] = useState<CategoryFilter>('all')
 
-  // Filter buttons configuration
   const filters = [
     { id: 'all' as CategoryFilter, label: 'All Projects', icon: FiGrid },
     { id: 'web' as CategoryFilter, label: 'Web Development', icon: FiCode },
     { id: 'design' as CategoryFilter, label: 'Graphic Design', icon: FiPenTool },
   ]
 
-  // Filter projects based on active filter
-  const filteredProjects = activeFilter === 'all'
+  // Filter projects by category
+  const filteredByCategory = activeFilter === 'all'
     ? projects
     : projects.filter(project => project.category === activeFilter)
+
+  // Show only featured projects (first 6)
+  const featuredProjects = filteredByCategory.filter(p => p.featured).slice(0, 6)
+  
+  // Total count
+  const totalCount = filteredByCategory.length
 
   return (
     <section id="projects" className="section-padding">
@@ -33,7 +39,7 @@ const ProjectsSection = () => {
           className="text-center mb-12"
         >
           <h2 className="section-title">My Projects</h2>
-          <p className="section-subtitle">Some of my recent work and personal projects</p>
+          <p className="section-subtitle">Featured work and recent projects</p>
         </motion.div>
 
         {/* Filter Buttons */}
@@ -42,7 +48,7 @@ const ProjectsSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-12"
+          className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8"
         >
           {filters.map((filter) => (
             <button
@@ -69,7 +75,10 @@ const ProjectsSection = () => {
           className="text-center mb-8"
         >
           <p className="text-slate-500 dark:text-slate-400 text-sm">
-            Showing <span className="font-bold text-cyan-500">{filteredProjects.length}</span> project{filteredProjects.length !== 1 ? 's' : ''}
+            Showing <span className="font-bold text-cyan-500">{featuredProjects.length}</span> featured projects
+            {totalCount > 6 && (
+              <> • <Link to="/projects" className="text-cyan-500 hover:text-cyan-600 font-medium underline">View all {totalCount}</Link></>
+            )}
           </p>
         </motion.div>
 
@@ -83,7 +92,7 @@ const ProjectsSection = () => {
             transition={{ duration: 0.3 }}
             className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-            {filteredProjects.map((project, index) => (
+            {featuredProjects.map((project, index) => (
               <ProjectCard 
                 key={project.id} 
                 project={project} 
@@ -94,7 +103,7 @@ const ProjectsSection = () => {
         </AnimatePresence>
 
         {/* No Projects Message */}
-        {filteredProjects.length === 0 && (
+        {featuredProjects.length === 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -104,32 +113,36 @@ const ProjectsSection = () => {
               <FiGrid className="w-10 h-10 text-slate-400" />
             </div>
             <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
-              No projects found
+              No featured projects
             </h3>
-            <p className="text-slate-500 dark:text-slate-400">
-              No projects match the selected filter.
+            <p className="text-slate-500 dark:text-slate-400 mb-6">
+              No featured projects match the selected filter.
             </p>
+            <Link to="/projects" className="btn-primary">
+              View All Projects
+            </Link>
           </motion.div>
         )}
 
-        {/* View More / GitHub Link */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="text-center mt-12"
-        >
-          <a
-            href="https://github.com/einadid"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-secondary"
+        {/* View All Projects Button */}
+        {totalCount > 6 && featuredProjects.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="text-center mt-12"
           >
-            <FiCode className="w-5 h-5" />
-            View More on GitHub
-          </a>
-        </motion.div>
+            <Link
+              to="/projects"
+              className="btn-primary group inline-flex"
+            >
+              <FiGrid className="w-5 h-5" />
+              View All Projects ({totalCount} total)
+              <FiChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </motion.div>
+        )}
       </div>
     </section>
   )

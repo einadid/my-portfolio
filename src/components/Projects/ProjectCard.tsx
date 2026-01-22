@@ -1,19 +1,17 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { FiExternalLink, FiGithub, FiArrowRight } from 'react-icons/fi'
+import { FiExternalLink, FiGithub, FiArrowRight, FiImage } from 'react-icons/fi'
 
 interface Project {
   id: string
   name: string
   shortDescription: string
-  fullDescription: string
-  image: string
+  thumbnail: string
+  images: string[]
   techStack: string[]
   category: 'web' | 'design' | 'both'
   liveUrl?: string
   githubUrl?: string
-  challenges: string[]
-  futurePlans: string[]
   featured: boolean
 }
 
@@ -40,9 +38,9 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
           </span>
         </div>
 
-        {/* Image */}
+        {/* Thumbnail Image */}
         <img
-          src={project.image}
+          src={project.thumbnail}
           alt={project.name}
           className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           onError={(e) => {
@@ -73,6 +71,16 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
           </div>
         )}
 
+        {/* Image Count Badge */}
+        {project.images.length > 0 && (
+          <div className="absolute bottom-3 right-3 z-10">
+            <span className="px-2 py-1 rounded-lg text-xs font-medium bg-black/50 text-white backdrop-blur-md flex items-center gap-1">
+              <FiImage className="w-3 h-3" />
+              {project.images.length}
+            </span>
+          </div>
+        )}
+
         {/* Overlay with Quick Links */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center pb-4 z-20">
           <div className="flex gap-3">
@@ -83,6 +91,7 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-colors"
                 title="Live Demo"
+                onClick={(e) => e.stopPropagation()}
               >
                 <FiExternalLink className="w-5 h-5" />
               </a>
@@ -94,6 +103,7 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-colors"
                 title="View Code"
+                onClick={(e) => e.stopPropagation()}
               >
                 <FiGithub className="w-5 h-5" />
               </a>
@@ -116,7 +126,7 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
 
         {/* Tech Stack */}
         <div className="flex flex-wrap gap-1.5 mb-4">
-          {project.techStack.slice(0, 4).map((tech, idx) => (
+          {project.techStack.slice(0, 3).map((tech, idx) => (
             <span
               key={idx}
               className="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded text-xs font-medium"
@@ -124,9 +134,9 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
               {tech}
             </span>
           ))}
-          {project.techStack.length > 4 && (
+          {project.techStack.length > 3 && (
             <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-500 rounded text-xs">
-              +{project.techStack.length - 4}
+              +{project.techStack.length - 3}
             </span>
           )}
         </div>
