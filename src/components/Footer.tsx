@@ -6,8 +6,7 @@ import {
   FiMail,
   FiArrowUp,
   FiPhone,
-  FiMapPin,
-  FiExternalLink
+  FiMapPin
 } from 'react-icons/fi'
 import { personalInfo } from '../data/personalInfo'
 
