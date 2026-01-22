@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiGrid, FiCode, FiPenTool, FiLayers } from 'react-icons/fi'
+import { FiGrid, FiCode, FiPenTool } from 'react-icons/fi'
 import { projects } from '../../data/projects'
 import ProjectCard from './ProjectCard'
 
