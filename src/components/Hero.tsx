@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { FiDownload, FiGithub, FiLinkedin, FiYoutube, FiMail } from 'react-icons/fi'
 import { personalInfo } from '../data/personalInfo'
+import { projects } from '../data/projects'
 
 const Hero = () => {
   const socialLinks = [
@@ -29,7 +30,7 @@ const Hero = () => {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="text-cyan-500 font-medium text-lg mb-2"
             >
-              👋 Hello, I'm
+               Hello, I'm
             </motion.p>
 
             {/* Name */}
@@ -152,6 +153,7 @@ const Hero = () => {
                 />
               </div>
 
+              {/* Experience Badge */}
               <motion.div
                 className="absolute -right-4 top-8 bg-white dark:bg-slate-800 rounded-lg shadow-lg px-4 py-2 border border-slate-200 dark:border-slate-700"
                 initial={{ opacity: 0, x: 20 }}
@@ -162,13 +164,14 @@ const Hero = () => {
                 <p className="text-xs text-slate-600 dark:text-slate-400">Years Exp.</p>
               </motion.div>
 
+              {/* Projects Badge - DYNAMIC */}
               <motion.div
                 className="absolute -left-4 bottom-8 bg-white dark:bg-slate-800 rounded-lg shadow-lg px-4 py-2 border border-slate-200 dark:border-slate-700"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 1 }}
               >
-                <p className="text-2xl font-bold text-cyan-500">50+</p>
+                <p className="text-2xl font-bold text-cyan-500">{projects.length}</p>
                 <p className="text-xs text-slate-600 dark:text-slate-400">Projects</p>
               </motion.div>
             </div>

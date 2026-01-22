@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { FiMapPin, FiMail, FiPhone, FiCalendar, FiCode, FiHeart, FiTarget, FiUser } from 'react-icons/fi'
 import { personalInfo } from '../data/personalInfo'
+import { projects } from '../data/projects'
 
 const About = () => {
   const infoCards = [
@@ -153,15 +154,15 @@ const About = () => {
               <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">{personalInfo.name}</h3>
               <p className="text-cyan-500 font-medium mb-4">{personalInfo.designation}</p>
               <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-200 dark:border-slate-700">
-                <div>
-                  <p className="text-2xl font-bold text-cyan-500">3+</p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Years Exp.</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-cyan-500">50+</p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Projects</p>
-                </div>
-              </div>
+  <div>
+    <p className="text-2xl font-bold text-cyan-500">3+</p>
+    <p className="text-sm text-slate-500 dark:text-slate-400">Years Exp.</p>
+  </div>
+  <div>
+    <p className="text-2xl font-bold text-cyan-500">{projects.length}</p>
+    <p className="text-sm text-slate-500 dark:text-slate-400">Projects</p>
+  </div>
+</div>
             </motion.div>
 
             {infoCards.map((info, idx) => (
