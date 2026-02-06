@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiMenu, FiX } from 'react-icons/fi'
+import { FiMenu, FiX, FiHome, FiUser, FiCode, FiBookOpen, FiBriefcase, FiMail } from 'react-icons/fi'
 import ThemeToggle from './ThemeToggle'
 
 const navLinks = [
-  { name: 'Home', href: '#home' },
-  { name: 'About', href: '#about' },
-  { name: 'Skills', href: '#skills' },
-  { name: 'Education', href: '#education' },
-  { name: 'Projects', href: '#projects' },
-  { name: 'Contact', href: '#contact' },
+  { name: 'Home', href: '#home', icon: FiHome },
+  // { name: 'About', href: '#about', icon: FiUser },
+  { name: 'Projects', href: '#projects', icon: FiBriefcase },
+  { name: 'Skills', href: '#skills', icon: FiCode },
+  { name: 'Education', href: '#education', icon: FiBookOpen },
+  { name: 'Contact', href: '#contact', icon: FiMail },
 ]
 
 const Navbar = () => {
@@ -166,10 +166,10 @@ const Navbar = () => {
             <div className="flex items-center gap-3 relative z-[60]">
               <ThemeToggle />
 
-              {/* Mobile Menu Button */}
+              {/* Mobile Menu Button - Now hidden since we have bottom nav */}
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="lg:hidden p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-all duration-300"
+                className="hidden lg:hidden p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-all duration-300"
                 aria-label="Toggle menu"
               >
                 {isOpen ? <FiX className="w-5 h-5" /> : <FiMenu className="w-5 h-5" />}
@@ -179,117 +179,56 @@ const Navbar = () => {
         </nav>
       </header>
 
-      {/* Mobile Menu - Full Screen Overlay */}
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            {/* Dark Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[55] lg:hidden"
-              onClick={() => setIsOpen(false)}
-            />
-
-            {/* Slide-in Menu Panel */}
-            <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 w-[280px] sm:w-[320px] bg-white dark:bg-slate-900 shadow-2xl z-[60] lg:hidden flex flex-col"
-            >
-              {/* Menu Header */}
-              <div className="flex items-center justify-between p-5 border-b border-slate-200 dark:border-slate-800 flex-shrink-0">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center">
-                    <span className="text-white font-bold">EN</span>
-                  </div>
-                  <div>
-                    <span className="font-bold text-slate-800 dark:text-white block">Menu</span>
-                    <span className="text-xs text-slate-500 dark:text-slate-400">Navigation</span>
-                  </div>
+      {/* Mobile Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800">
+        <nav className="flex items-center justify-around py-2">
+          {navLinks.map((link) => {
+            const isActive = activeSection === link.href.replace('#', '') && isHomePage
+            const Icon = link.icon
+            
+            return (
+              <motion.button
+                key={link.name}
+                onClick={() => scrollToSection(link.href)}
+                className={`flex flex-col items-center justify-center p-2 min-w-[60px] rounded-lg transition-all ${
+                  isActive
+                    ? 'text-cyan-600 dark:text-cyan-400'
+                    : 'text-slate-500 dark:text-slate-400'
+                }`}
+                whileTap={{ scale: 0.9 }}
+              >
+                <div className="relative">
+                  <Icon className={`w-5 h-5 transition-all ${
+                    isActive ? 'scale-110' : ''
+                  }`} />
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeIndicator"
+                      className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-cyan-600 dark:bg-cyan-400 rounded-full"
+                      initial={false}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    />
+                  )}
                 </div>
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-colors"
-                >
-                  <FiX className="w-5 h-5" />
-                </button>
-              </div>
+                <span className={`text-[10px] mt-1 font-medium ${
+                  isActive ? 'opacity-100' : 'opacity-70'
+                }`}>
+                  {link.name}
+                </span>
+              </motion.button>
+            )
+          })}
+        </nav>
+      </div>
 
-              {/* Menu Links */}
-              <nav className="flex-1 overflow-y-auto p-5">
-                <ul className="space-y-2">
-                  {navLinks.map((link, index) => {
-                    const isActive = activeSection === link.href.replace('#', '') && isHomePage
-                    return (
-                      <motion.li
-                        key={link.name}
-                        initial={{ opacity: 0, x: 30 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.05 + 0.1 }}
-                      >
-                        <button
-                          onClick={() => scrollToSection(link.href)}
-                          className={`w-full text-left px-4 py-4 rounded-xl text-base font-medium transition-all duration-300 flex items-center gap-4 ${
-                            isActive
-                              ? 'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 border-l-4 border-cyan-500'
-                              : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border-l-4 border-transparent hover:border-slate-300 dark:hover:border-slate-600'
-                          }`}
-                        >
-                          <span className={`w-3 h-3 rounded-full flex-shrink-0 ${
-                            isActive 
-                              ? 'bg-cyan-500' 
-                              : 'bg-slate-300 dark:bg-slate-600'
-                          }`} />
-                          <span className="flex-1">{link.name}</span>
-                          {isActive && (
-                            <span className="text-xs bg-cyan-500 text-white px-2 py-0.5 rounded-full">
-                              Active
-                            </span>
-                          )}
-                        </button>
-                      </motion.li>
-                    )
-                  })}
-                </ul>
-
-                {/* Quick Contact Card */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  className="mt-8 p-4 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl text-white"
-                >
-                  <h4 className="font-bold mb-2">Get in Touch</h4>
-                  <p className="text-sm text-cyan-100 mb-3">
-                    Have a project in mind? Let's talk!
-                  </p>
-                  <button
-                    onClick={() => scrollToSection('#contact')}
-                    className="w-full py-2.5 bg-white text-cyan-600 rounded-lg font-medium hover:bg-cyan-50 transition-colors"
-                  >
-                    Contact Me
-                  </button>
-                </motion.div>
-              </nav>
-
-              {/* Menu Footer */}
-              <div className="p-5 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex-shrink-0">
-                <p className="text-sm text-slate-500 dark:text-slate-400 text-center">
-                  © 2025 Emamul Islam Nadid
-                </p>
-                <p className="text-xs text-slate-400 dark:text-slate-500 text-center mt-1">
-                  Graphic Designer & Web Developer
-                </p>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      {/* Add padding bottom to main content on mobile to account for bottom nav */}
+      <style jsx global>{`
+        @media (max-width: 1023px) {
+          body {
+            padding-bottom: 70px;
+          }
+        }
+      `}</style>
     </>
   )
 }
