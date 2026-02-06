@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { FiHome, FiCode, FiBookOpen, FiBriefcase, FiMail, FiLayers } from 'react-icons/fi'
+import { FiHome, FiCode, FiBookOpen, FiBriefcase, FiMail } from 'react-icons/fi'
 import ThemeToggle from './ThemeToggle'
 
 const navLinks = [
