@@ -1,0 +1,17 @@
+{
+  "name": "Emamul Islam Nadid — Portfolio",
+  "short_name": "Nadid",
+  "description": "Graphic designer & web developer from Chattogram, Bangladesh. Brand identity, UI design and modern React builds.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#070810",
+  "theme_color": "#070810",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    }
+  ]
+}

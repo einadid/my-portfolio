@@ -1,182 +1,267 @@
-import { motion } from 'framer-motion'
-import { FiDownload, FiGithub, FiLinkedin, FiYoutube, FiMail } from 'react-icons/fi'
+import { useRef } from 'react'
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
+import { FiArrowDown, FiArrowUpRight, FiDownload, FiGithub, FiLinkedin, FiYoutube } from 'react-icons/fi'
+import { HiOutlineSparkles } from 'react-icons/hi'
+import StatusPill from './ui/StatusPill'
+import RotatingText from './ui/RotatingText'
+import { Marquee } from './ui/Marquee'
+import { SmartImage, MonogramFallback } from './ui/SmartImage'
 import { personalInfo } from '../data/personalInfo'
-import { projects } from '../data/projects'
+import { scrollToSection } from '../lib/utils'
+import { getStats, marqueeItems } from '../data/skills'
+import { liveProjects } from '../data/projects'
 
-const Hero = () => {
-  const socialLinks = [
-    { name: 'GitHub', url: personalInfo.github, icon: FiGithub, color: 'hover:text-gray-900 dark:hover:text-white' },
-    { name: 'LinkedIn', url: personalInfo.linkedin, icon: FiLinkedin, color: 'hover:text-blue-600' },
-    { name: 'YouTube', url: personalInfo.youtube, icon: FiYoutube, color: 'hover:text-red-500' },
-    { name: 'Email', url: `mailto:${personalInfo.email}`, icon: FiMail, color: 'hover:text-cyan-500' }
-  ]
+const socials = [
+  { label: 'GitHub', href: personalInfo.github, Icon: FiGithub },
+  { label: 'LinkedIn', href: personalInfo.linkedin, Icon: FiLinkedin },
+  { label: 'Behance', href: personalInfo.behance, Icon: HiOutlineSparkles },
+  { label: 'YouTube', href: personalInfo.youtube, Icon: FiYoutube },
+]
+
+const line = {
+  hidden: { y: '112%' },
+  show: (i: number) => ({
+    y: '0%',
+    transition: { duration: 0.9, delay: 0.12 + i * 0.1, ease: [0.22, 1, 0.36, 1] as const },
+  }),
+}
+
+export function Hero() {
+  const stats = getStats(liveProjects.length, 2021)
+  const portraitRef = useRef<HTMLDivElement>(null)
+  const mx = useMotionValue(0)
+  const my = useMotionValue(0)
+  const rotateX = useSpring(useTransform(my, [-0.5, 0.5], [7, -7]), { stiffness: 160, damping: 18 })
+  const rotateY = useSpring(useTransform(mx, [-0.5, 0.5], [-7, 7]), { stiffness: 160, damping: 18 })
+
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const rect = portraitRef.current?.getBoundingClientRect()
+    if (!rect) return
+    mx.set((e.clientX - rect.left) / rect.width - 0.5)
+    my.set((e.clientY - rect.top) / rect.height - 0.5)
+  }
+
+  const reset = () => {
+    mx.set(0)
+    my.set(0)
+  }
+
+  const scrollToWork = () => scrollToSection('work')
 
   return (
-    <section id="home" className="min-h-screen flex items-center justify-center pt-32 sm:pt-24 lg:pt-20 pb-16 overflow-hidden">
-      <div className="container-custom">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
-          
-          {/* Left Side - Text Content */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center lg:text-left order-2 lg:order-1"
-          >
-            {/* Greeting */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-cyan-500 font-medium text-lg mb-2"
-            >
-               Hello, I'm
-            </motion.p>
-
-            {/* Name */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white mb-4"
-            >
-              <span className="text-cyan-500">{personalInfo.name.split(' ')[0]}</span>{' '}
-              {personalInfo.name.split(' ').slice(1).join(' ')}
-            </motion.h1>
-
-            {/* Designation */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="mb-6"
-            >
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
-                {personalInfo.designation}
-              </h2>
+    <section id="home" className="relative isolate overflow-hidden pt-24 pb-10 sm:pt-28 lg:pt-32">
+      <div className="shell">
+        <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-10">
+          {/* ---------------------------------------------------------------- copy */}
+          <div className="lg:col-span-7">
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+              <StatusPill />
             </motion.div>
 
-            {/* Short Bio */}
+            <p className="kicker mt-7">Hi — I’m {personalInfo.name}</p>
+
+            <h1 className="h-display mt-3">
+              {['I design brands', 'that earn attention', '— then I build them.'].map((text, i) => (
+                <span key={text} className="block overflow-hidden pb-[0.06em]">
+                  <motion.span
+                    custom={i}
+                    variants={line}
+                    initial="hidden"
+                    animate="show"
+                    className={`block ${i === 1 ? 'text-gradient' : ''} ${
+                      i === 2 ? 'text-fg/45 sm:text-fg/60' : ''
+                    }`}
+                  >
+                    {text}
+                  </motion.span>
+                </span>
+              ))}
+            </h1>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.6 }}
+              className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2"
+            >
+              <span className="hidden h-px w-10 bg-gradient-to-r from-accent to-transparent sm:block" />
+              <span className="font-display text-lg font-semibold text-fg sm:text-xl">
+                <RotatingText words={personalInfo.headline} className="text-gradient" />
+              </span>
+              <span className="text-sm text-muted">in {personalInfo.location.split(',').slice(-2).join(',').trim()}</span>
+            </motion.div>
+
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="text-slate-600 dark:text-slate-400 text-base sm:text-lg leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0 text-justify lg:text-left"
+              transition={{ delay: 0.62, duration: 0.6 }}
+              className="lede mt-6 max-w-xl"
             >
               {personalInfo.shortBio}
             </motion.p>
 
-            {/* Buttons */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8"
+              transition={{ delay: 0.72, duration: 0.6 }}
+              className="mt-8 flex flex-wrap items-center gap-3"
             >
-              <a href={personalInfo.resumeUrl} download className="btn-primary">
-                <FiDownload className="w-5 h-5" />
-                Download Resume
+              <button type="button" onClick={scrollToWork} className="btn btn-solid group/work">
+                See selected work
+                <span className="text-[15px] text-white/70">({liveProjects.length})</span>
+                <FiArrowDown className="h-4 w-4 transition-transform duration-300 group-hover/work:translate-y-0.5" />
+              </button>
+              <a href={personalInfo.resumeUrl} download className="btn btn-ghost">
+                <FiDownload className="h-4 w-4" />
+                Résumé
               </a>
-              <a
-                href="#contact"
-                className="btn-secondary"
-                onClick={(e) => {
-                  e.preventDefault()
-                  document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
-                }}
-              >
-                <FiMail className="w-5 h-5" />
-                Contact Me
+              <a href={`mailto:${personalInfo.email}`} className="btn btn-soft !px-4 text-[13px]">
+                {personalInfo.email}
+                <FiArrowUpRight className="h-3.5 w-3.5 text-accent" />
               </a>
             </motion.div>
 
-            {/* Social Links */}
+            {/* socials + stats */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
-              className="flex gap-4 justify-center lg:justify-start"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.85, duration: 0.6 }}
+              className="mt-9 flex flex-wrap items-center justify-between gap-6"
             >
-              {socialLinks.map((social) => (
-                <motion.a
-                  key={social.name}
-                  href={social.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`p-3 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 transition-all duration-300 ${social.color}`}
-                  whileHover={{ scale: 1.1, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  aria-label={social.name}
-                >
-                  <social.icon className="w-5 h-5" />
-                </motion.a>
-              ))}
-            </motion.div>
-          </motion.div>
-
-          {/* Right Side - Profile Image */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex justify-center order-1 lg:order-2"
-          >
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full blur-3xl opacity-20 scale-110" />
-              
-              <motion.div
-                className="absolute inset-0 rounded-full border-2 border-dashed border-cyan-500/30"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                style={{ margin: '-10px' }}
-              />
-
-              <div className="relative w-64 h-64 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-full overflow-hidden border-4 border-white dark:border-slate-800 shadow-2xl">
-                <img 
-                  src="/profile.jpg" 
-                  alt={personalInfo.name}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement
-                    target.style.display = 'none'
-                    if (target.parentElement) {
-                      target.parentElement.innerHTML = `
-                        <div class="w-full h-full bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-500 flex items-center justify-center">
-                          <div class="text-center text-white">
-                            <div class="text-6xl sm:text-7xl lg:text-8xl font-bold mb-2">EN</div>
-                            <p class="text-sm sm:text-base opacity-80">Add your photo</p>
-                          </div>
-                        </div>
-                      `
-                    }
-                  }}
-                />
+              <div className="flex items-center gap-2">
+                {socials.map(({ label, href, Icon }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    aria-label={label}
+                    title={label}
+                    className="icon-btn"
+                  >
+                    <Icon className="h-4 w-4" />
+                  </a>
+                ))}
               </div>
-
-              {/* Experience Badge */}
-              <motion.div
-                className="absolute -right-4 top-8 bg-white dark:bg-slate-800 rounded-lg shadow-lg px-4 py-2 border border-slate-200 dark:border-slate-700"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.8 }}
+              <button
+                type="button"
+                onClick={() => scrollToSection('contact')}
+                className="group inline-flex items-center gap-2 text-sm text-muted"
               >
-                <p className="text-2xl font-bold text-cyan-500">3+</p>
-                <p className="text-xs text-slate-600 dark:text-slate-400">Years Exp.</p>
+                <span className="link-underline">Currently taking new briefs</span>
+                <FiArrowUpRight className="h-4 w-4 text-accent transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+              </button>
+            </motion.div>
+          </div>
+
+          {/* ---------------------------------------------------------------- portrait */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.94, y: 18 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="relative mx-auto w-full max-w-[24rem] lg:col-span-5 lg:mx-0 lg:max-w-none"
+          >
+            <div
+              ref={portraitRef}
+              onPointerMove={onPointerMove}
+              onPointerLeave={reset}
+              style={{ perspective: 1000 }}
+              className="group relative"
+            >
+              <motion.div
+                style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
+                className="relative rounded-[2.2rem] border border-line bg-surface/60 p-2.5 backdrop-blur-xl shadow-lift"
+              >
+                {/* corner ticks */}
+                <span className="absolute left-4 top-4 h-5 w-5 rounded-tl-xl border-l border-t border-accent/50" aria-hidden />
+                <span className="absolute bottom-4 right-4 h-5 w-5 rounded-br-xl border-b border-r border-accent3/50" aria-hidden />
+
+                <SmartImage
+                  src="/profile.webp"
+                  alt={`${personalInfo.name}, ${personalInfo.tagline}`}
+                  eager
+                  sizes="(min-width:1024px) 380px, 80vw"
+                  className="aspect-4/5 w-full rounded-[1.7rem]"
+                  imgClassName="object-cover transition-transform duration-[1.2s] group-hover:scale-[1.04]"
+                  fallback={<MonogramFallback label={personalInfo.name} />}
+                />
+
+                {/* gradient veil over the photo */}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-2.5 rounded-[1.7rem] bg-gradient-to-t from-[rgb(7_8_16/0.55)] via-transparent to-transparent opacity-70 mix-blend-multiply dark:opacity-40"
+                />
+
+                {/* floating name plate */}
+                <motion.div
+                  style={{ transform: 'translateZ(40px)' }}
+                  className="absolute bottom-5 left-5 right-5 flex items-center justify-between gap-3 rounded-2xl border border-white/15 bg-[rgb(10_12_22/0.62)] px-3.5 py-2.5 backdrop-blur-md"
+                >
+                  <span className="min-w-0">
+                    <span className="block truncate font-display text-sm font-semibold text-white">
+                      {personalInfo.name}
+                    </span>
+                    <span className="block truncate font-mono text-[10px] uppercase tracking-[0.16em] text-white/55">
+                      {personalInfo.tagline}
+                    </span>
+                  </span>
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-accent to-accent3 text-white">
+                    <FiArrowUpRight className="h-4 w-4" />
+                  </span>
+                </motion.div>
               </motion.div>
 
-              {/* Projects Badge - DYNAMIC */}
+              {/* orbiting chips */}
               <motion.div
-                className="absolute -left-4 bottom-8 bg-white dark:bg-slate-800 rounded-lg shadow-lg px-4 py-2 border border-slate-200 dark:border-slate-700"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 1 }}
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+                className="absolute -left-3 top-10 hidden rounded-2xl border border-line bg-surface/90 px-3 py-2 shadow-panel backdrop-blur-xl sm:block"
               >
-                <p className="text-2xl font-bold text-cyan-500">{projects.length}</p>
-                <p className="text-xs text-slate-600 dark:text-slate-400">Projects</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-faint">Design</p>
+                <p className="font-display text-sm font-semibold">Photoshop · Illustrator</p>
+                <div className="mt-1.5 h-1 w-28 overflow-hidden rounded-full bg-surface2">
+                  <div className="h-full w-[93%] rounded-full bg-gradient-to-r from-accent to-accent3" />
+                </div>
+              </motion.div>
+
+              <motion.div
+                animate={{ y: [0, 12, 0] }}
+                transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}
+                className="absolute -right-2 bottom-24 rounded-2xl border border-line bg-surface/90 px-3 py-2 text-right shadow-panel backdrop-blur-xl"
+              >
+                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-faint">Currently</p>
+                <p className="font-display text-sm font-semibold text-accent">B.Sc. in CSE</p>
+                <p className="text-[11px] text-muted">Port City Intl. University</p>
               </motion.div>
             </div>
           </motion.div>
         </div>
+
+        {/* stat strip */}
+        <motion.dl
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.9, duration: 0.7 }}
+          className="panel mt-14 grid grid-cols-2 divide-line/70 md:mt-20 md:grid-cols-4 md:divide-x"
+        >
+          {stats.map((stat, i) => (
+            <div
+              key={stat.label}
+              className={`flex flex-col gap-0.5 px-5 py-4 sm:px-6 sm:py-5 ${i < 2 ? 'border-b border-line/70 md:border-b-0' : ''} ${
+                i % 2 === 1 ? 'border-l border-line/70 md:border-l-0' : ''
+              }`}
+            >
+              <dt className="order-2 font-mono text-[11px] uppercase tracking-[0.14em] text-faint">{stat.label}</dt>
+              <dd className="order-1 font-display text-2xl font-bold tracking-tight sm:text-3xl">{stat.value}</dd>
+              <dd className="order-3 text-xs text-muted">{stat.note}</dd>
+            </div>
+          ))}
+        </motion.dl>
+      </div>
+
+      {/* tech ticker */}
+      <div className="mt-14 border-y border-line/70 bg-surface/40 py-3 backdrop-blur-sm sm:mt-16">
+        <Marquee items={marqueeItems} />
       </div>
     </section>
   )

@@ -1,42 +1,21 @@
-import Navbar from '../components/Navbar'
 import Hero from '../components/Hero'
-// import About from '../components/About'
-import Skills from '../components/Skills'
-import Education from '../components/Education'
 import ProjectsSection from '../components/Projects/ProjectsSection'
+import Services from '../components/Services'
+import Skills from '../components/Skills'
+import Journey from '../components/Journey'
+import About from '../components/About'
 import Contact from '../components/Contact'
-import Footer from '../components/Footer'
 
-const Home = () => {
+export default function Home() {
   return (
     <>
-      {/* Navbar */}
-      <Navbar />
-
-      <main>
-        {/* Hero Section */}
-        <Hero />
-
-        {/* About Section */}
-        {/* <About /> */}
-
-        {/* Projects Section */}
-        <ProjectsSection />
-
-        {/* Skills Section */}
-        <Skills />
-
-        {/* Education & Experience Section */}
-        <Education />
-
-        {/* Contact Section */}
-        <Contact />
-      </main>
-
-      {/* Footer */}
-      <Footer />
+      <Hero />
+      <ProjectsSection />
+      <Services />
+      <Skills />
+      <Journey />
+      <About />
+      <Contact />
     </>
   )
 }
-
-export default Home

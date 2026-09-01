@@ -1,26 +1,84 @@
-<!DOCTYPE html>
-<html lang="en" class="dark">
+<!doctype html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#070810" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f8f9fd" media="(prefers-color-scheme: light)" />
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
-    <!-- SEO Meta Tags -->
-    <title>Emamul Islam Nadid | Graphic Designer & Web Developer</title>
-    <meta name="description" content="Portfolio of Emamul Islam Nadid - A passionate Graphic Designer & Junior Web Developer with 3+ years of experience in design and illustration." />
-    <meta name="keywords" content="Emamul Islam Nadid, Graphic Designer, Web Developer, Portfolio, React, Bangladesh" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+
+    <!-- Primary Meta -->
+    <title>Emamul Islam Nadid — Graphic Designer & Web Developer</title>
+    <meta
+      name="description"
+      content="Portfolio of Emamul Islam Nadid — a graphic designer and web developer from Chattogram, Bangladesh. Brand identity, social media design and modern React web apps."
+    />
     <meta name="author" content="Emamul Islam Nadid" />
-    
-    <!-- Open Graph / Social Media -->
+    <meta
+      name="keywords"
+      content="Emamul Islam Nadid, Graphic Designer, Web Developer, React Developer, Brand Identity, Portfolio, Chattogram, Bangladesh"
+    />
+    <link rel="canonical" href="https://einadid.vercel.app/" />
+
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Emamul Islam Nadid | Graphic Designer & Web Developer" />
-    <meta property="og:description" content="Portfolio of Emamul Islam Nadid - A passionate Graphic Designer & Junior Web Developer." />
-    <meta property="og:image" content="/og-image.png" />
-    
+    <meta property="og:site_name" content="Emamul Islam Nadid" />
+    <meta property="og:title" content="Emamul Islam Nadid — Graphic Designer & Web Developer" />
+    <meta
+      property="og:description"
+      content="Brand identity, social media design and modern, performant web apps. 3+ years of design experience, now building for the web."
+    />
+    <meta property="og:image" content="/og-image.jpg" />
+    <meta property="og:url" content="https://einadid.vercel.app/" />
+
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Emamul Islam Nadid | Graphic Designer & Web Developer" />
-    <meta name="twitter:description" content="Portfolio of Emamul Islam Nadid - A passionate Graphic Designer & Junior Web Developer." />
+    <meta name="twitter:title" content="Emamul Islam Nadid — Graphic Designer & Web Developer" />
+    <meta
+      name="twitter:description"
+      content="Brand identity, social media design and modern, performant web apps from Chattogram, Bangladesh."
+    />
+    <meta name="twitter:image" content="/og-image.jpg" />
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Emamul Islam Nadid",
+        "jobTitle": "Graphic Designer & Web Developer",
+        "url": "https://einadid.vercel.app/",
+        "email": "mailto:einadid0123@gmail.com",
+        "telephone": "+8801678791177",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Chattogram",
+          "addressCountry": "BD"
+        },
+        "sameAs": [
+          "https://github.com/einadid",
+          "https://linkedin.com/in/einadid",
+          "https://youtube.com/@einadid"
+        ]
+      }
+    </script>
+
+    <!-- Apply saved theme before paint to avoid a flash -->
+    <script>
+      ;(function () {
+        try {
+          var stored = localStorage.getItem('theme')
+          var dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches
+          document.documentElement.classList.toggle('dark', dark)
+        } catch (e) {
+          document.documentElement.classList.add('dark')
+        }
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

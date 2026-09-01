@@ -1,326 +1,157 @@
-import { motion } from 'framer-motion'
-import { 
-  FiGithub, 
-  FiLinkedin, 
-  FiYoutube, 
-  FiMail,
-  FiArrowUp,
-  FiPhone,
-  FiMapPin
-} from 'react-icons/fi'
+import { Link } from 'react-router-dom'
+import { FiArrowUp, FiGithub, FiLinkedin, FiMail, FiYoutube } from 'react-icons/fi'
+import { HiOutlineSparkles } from 'react-icons/hi'
 import { personalInfo } from '../data/personalInfo'
+import { navItems } from '../data/siteNav'
+import { services } from '../data/services'
+import { useReducedMotion } from 'framer-motion'
+import { scrollToSection } from '../lib/utils'
 
-const Footer = () => {
-  // Navigation links
-  const navLinks = [
-    { name: 'Home', href: '#home' },
-    { name: 'About', href: '#about' },
-    { name: 'Skills', href: '#skills' },
-    { name: 'Education', href: '#education' },
-    { name: 'Projects', href: '#projects' },
-    { name: 'Contact', href: '#contact' },
+export function Footer() {
+  const year = new Date().getFullYear()
+  const reduce = useReducedMotion()
+
+  const jump = (id: string) => scrollToSection(id)
+
+  const socials = [
+    { label: 'GitHub', href: personalInfo.github, Icon: FiGithub },
+    { label: 'LinkedIn', href: personalInfo.linkedin, Icon: FiLinkedin },
+    { label: 'Behance', href: personalInfo.behance, Icon: HiOutlineSparkles },
+    { label: 'YouTube', href: personalInfo.youtube, Icon: FiYoutube },
+    { label: 'Email', href: `mailto:${personalInfo.email}`, Icon: FiMail },
   ]
-
-  // Services
-  const services = [
-    { name: 'Web Development', icon: '🌐' },
-    { name: 'Graphic Design', icon: '🎨' },
-    { name: 'UI/UX Design', icon: '📱' },
-    { name: 'Brand Identity', icon: '🎯' },
-    { name: 'Illustration', icon: '🖌️' },
-  ]
-
-  // Social links
-  const socialLinks = [
-    { 
-      icon: FiGithub, 
-      href: personalInfo.github, 
-      label: 'GitHub', 
-      gradient: 'from-gray-600 to-gray-800' 
-    },
-    { 
-      icon: FiLinkedin, 
-      href: personalInfo.linkedin, 
-      label: 'LinkedIn', 
-      gradient: 'from-blue-500 to-blue-700' 
-    },
-    { 
-      icon: FiYoutube, 
-      href: personalInfo.youtube, 
-      label: 'YouTube', 
-      gradient: 'from-red-500 to-red-700' 
-    },
-    { 
-      icon: FiMail, 
-      href: `mailto:${personalInfo.email}`, 
-      label: 'Email', 
-      gradient: 'from-cyan-500 to-cyan-700' 
-    },
-  ]
-
-  // Scroll to top
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  // Scroll to section
-  const scrollToSection = (href: string) => {
-    const element = document.getElementById(href.replace('#', ''))
-    if (element) {
-      const offset = element.getBoundingClientRect().top + window.pageYOffset - 80
-      window.scrollTo({ top: offset, behavior: 'smooth' })
-    }
-  }
-
-  const currentYear = new Date().getFullYear()
-
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.3
-      }
-    }
-  }
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5 }
-    }
-  }
 
   return (
-    <footer className="bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 dark:from-slate-950 dark:via-slate-950 dark:to-black text-white relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse delay-700" />
-        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl animate-pulse delay-1000" />
-      </div>
+    <footer className="relative mt-10 overflow-hidden border-t border-line bg-surface/50">
+      <span aria-hidden className="hairline-top !inset-x-0" />
 
-      {/* Decorative Top Border */}
-      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-50" />
-      
-      {/* Main Footer Content */}
-      <motion.div 
-        className="container-custom py-12 relative z-10"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        variants={containerVariants}
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-6">
-          
-          {/* Column 1 - Brand & Social */}
-          <motion.div variants={itemVariants} className="lg:col-span-4">
-            {/* Brand */}
-            <div className="flex items-center gap-3 mb-4">
-              <motion.div 
-                className="relative w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 via-cyan-500 to-blue-600 flex items-center justify-center shadow-xl shadow-cyan-500/30"
-                whileHover={{ scale: 1.05, rotate: 5 }}
-                transition={{ type: "spring", stiffness: 400 }}
-              >
-                <span className="text-white font-bold text-xl relative z-10">EN</span>
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent" />
-              </motion.div>
-              <div>
-                <h3 className="text-xl font-bold text-white bg-gradient-to-r from-white to-slate-300 bg-clip-text">
-                  Nadid
-                </h3>
-                <p className="text-cyan-400 text-xs font-medium">Designer & Developer</p>
-              </div>
-            </div>
-            
-            <p className="text-slate-400 leading-relaxed mb-5 text-sm">
-              Crafting beautiful digital experiences through innovative design and clean code. 
-              Transforming ideas into reality with passion and precision.
-            </p>
-            
-            {/* Social Links */}
-            <div>
-              <h5 className="text-white font-semibold mb-3 text-sm">Connect With Me</h5>
-              <div className="flex gap-2">
-                {socialLinks.map((social, index) => (
-                  <motion.a
-                    key={social.label}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group relative w-10 h-10 rounded-lg bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 flex items-center justify-center text-slate-400 hover:text-white transition-all duration-300 overflow-hidden"
-                    title={social.label}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ y: -3 }}
-                  >
-                    <div className={`absolute inset-0 bg-gradient-to-br ${social.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
-                    <social.icon className="w-4 h-4 relative z-10" />
-                  </motion.a>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Column 2 - Quick Links */}
-          <motion.div variants={itemVariants} className="lg:col-span-2">
-            <h4 className="text-base font-bold text-white mb-4 flex items-center gap-2">
-              <div className="w-1 h-5 bg-gradient-to-b from-cyan-400 to-blue-500 rounded-full" />
-              Quick Links
-            </h4>
-            <ul className="space-y-2">
-              {navLinks.map((link, index) => (
-                <motion.li 
-                  key={link.name}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                >
-                  <button
-                    onClick={() => scrollToSection(link.href)}
-                    className="text-slate-400 hover:text-cyan-400 transition-all duration-300 text-sm flex items-center gap-2 group"
-                  >
-                    <span className="w-1 h-1 rounded-full bg-slate-700 group-hover:bg-cyan-400 group-hover:scale-150 transition-all duration-300" />
-                    <span className="group-hover:translate-x-1 transition-transform duration-300">
-                      {link.name}
-                    </span>
-                  </button>
-                </motion.li>
-              ))}
-            </ul>
-          </motion.div>
-
-          {/* Column 3 - Services */}
-          <motion.div variants={itemVariants} className="lg:col-span-3">
-            <h4 className="text-base font-bold text-white mb-4 flex items-center gap-2">
-              <div className="w-1 h-5 bg-gradient-to-b from-cyan-400 to-blue-500 rounded-full" />
-              Services
-            </h4>
-            <ul className="space-y-2">
-              {services.map((service, index) => (
-                <motion.li 
-                  key={service.name}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="group"
-                >
-                  <div className="text-slate-400 text-sm flex items-center gap-2 hover:text-cyan-400 transition-all duration-300 cursor-default">
-                    <span className="text-base group-hover:scale-110 transition-transform duration-300">
-                      {service.icon}
-                    </span>
-                    <span className="group-hover:translate-x-1 transition-transform duration-300">
-                      {service.name}
-                    </span>
-                  </div>
-                </motion.li>
-              ))}
-            </ul>
-          </motion.div>
-
-          {/* Column 4 - Contact Info */}
-          <motion.div variants={itemVariants} className="lg:col-span-3">
-            <h4 className="text-base font-bold text-white mb-4 flex items-center gap-2">
-              <div className="w-1 h-5 bg-gradient-to-b from-cyan-400 to-blue-500 rounded-full" />
-              Get In Touch
-            </h4>
-            <ul className="space-y-2.5">
-              <li>
-                <a 
-                  href={`mailto:${personalInfo.email}`}
-                  className="group block"
-                >
-                  <div className="flex items-start gap-3 p-2.5 rounded-lg bg-slate-800/30 border border-slate-800 hover:border-cyan-500/50 hover:bg-slate-800/50 transition-all duration-300">
-                    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-500/30 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                      <FiMail className="w-4 h-4 text-cyan-400" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[11px] text-slate-500 mb-0.5 font-medium">Email Address</p>
-                      <p className="text-xs text-slate-300 group-hover:text-cyan-400 transition-colors truncate">
-                        {personalInfo.email}
-                      </p>
-                    </div>
-                  </div>
-                </a>
-              </li>
-              <li>
-                <a 
-                  href={`tel:${personalInfo.phone}`}
-                  className="group block"
-                >
-                  <div className="flex items-start gap-3 p-2.5 rounded-lg bg-slate-800/30 border border-slate-800 hover:border-green-500/50 hover:bg-slate-800/50 transition-all duration-300">
-                    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500/30 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                      <FiPhone className="w-4 h-4 text-green-400" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[11px] text-slate-500 mb-0.5 font-medium">Phone Number</p>
-                      <p className="text-xs text-slate-300 group-hover:text-green-400 transition-colors">
-                        {personalInfo.phone}
-                      </p>
-                    </div>
-                  </div>
-                </a>
-              </li>
-              <li>
-                <div className="flex items-start gap-3 p-2.5 rounded-lg bg-slate-800/30 border border-slate-800">
-                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-red-500/20 to-orange-500/20 border border-red-500/30 flex items-center justify-center flex-shrink-0">
-                    <FiMapPin className="w-4 h-4 text-red-400" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[11px] text-slate-500 mb-0.5 font-medium">Location</p>
-                    <p className="text-xs text-slate-300">{personalInfo.location}</p>
-                  </div>
-                </div>
-              </li>
-            </ul>
-          </motion.div>
-        </div>
-
-        {/* Divider */}
-        <div className="my-8 border-t border-slate-800"></div>
-
-        {/* Bottom Section */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          {/* Copyright */}
-          <div className="text-center sm:text-left">
-            <p className="text-slate-400 text-sm">
-              © {currentYear}{' '}
-              <span className="font-semibold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                Emamul Islam Nadid
+      <div className="shell relative py-14">
+        <div className="grid gap-10 lg:grid-cols-12">
+          {/* brand */}
+          <div className="lg:col-span-5">
+            <button
+              type="button"
+              onClick={() => window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' })}
+              className="group flex items-center gap-3 text-left"
+            >
+              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-accent via-accent2 to-accent3 font-display text-sm font-bold text-white shadow-[0_16px_36px_-18px_rgb(var(--accent-2)/0.9)]">
+                {personalInfo.initials}
               </span>
-              . All rights reserved.
+              <span>
+                <span className="block font-display text-lg font-bold tracking-tight">{personalInfo.name}</span>
+                <span className="block font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
+                  {personalInfo.tagline}
+                </span>
+              </span>
+            </button>
+
+            <p className="mt-5 max-w-sm text-sm leading-relaxed text-muted">
+              Design and front-end work from Chattogram for clients who care about the details. Currently open to
+              freelance projects, internships and full-time junior roles.
             </p>
-            <p className="text-slate-600 text-xs mt-0.5">
-              Designed & Developed with passion ✨
-            </p>
+
+            <div className="mt-6 flex flex-wrap gap-2">
+              {socials.map(({ label, href, Icon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target={href.startsWith('http') ? '_blank' : undefined}
+                  rel="noreferrer noopener"
+                  aria-label={label}
+                  title={label}
+                  className="icon-btn"
+                >
+                  <Icon className="h-4 w-4" />
+                </a>
+              ))}
+            </div>
           </div>
 
-          {/* Back to Top Button */}
-          <motion.button
-            onClick={scrollToTop}
-            className="group relative px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-semibold overflow-hidden shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-shadow duration-300"
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <div className="relative flex items-center gap-2">
-              <FiArrowUp className="w-4 h-4 group-hover:animate-bounce" />
-              <span>Back to Top</span>
-            </div>
-          </motion.button>
-        </div>
-      </motion.div>
+          {/* sitemap */}
+          <nav className="lg:col-span-3" aria-label="Footer">
+            <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-faint">Sitemap</h2>
+            <ul className="mt-4 grid gap-2">
+              {navItems.map((item) => (
+                <li key={item.id}>
+                  <button
+                    type="button"
+                    onClick={() => jump(item.id)}
+                    className="text-sm text-muted transition-colors hover:text-accent"
+                  >
+                    {item.label}
+                  </button>
+                </li>
+              ))}
+              <li>
+                <Link to="/projects" className="text-sm text-muted transition-colors hover:text-accent">
+                  All projects
+                </Link>
+              </li>
+            </ul>
+          </nav>
 
-      {/* Bottom Glow Effect */}
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />
+          {/* services */}
+          <div className="lg:col-span-2">
+            <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-faint">Services</h2>
+            <ul className="mt-4 grid gap-2">
+              {services.map((service) => (
+                <li key={service.id} className="text-sm leading-snug text-muted">
+                  {service.title.replace(/ &.*/, '')}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* contact */}
+          <div className="lg:col-span-2">
+            <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-faint">Reach me</h2>
+            <ul className="mt-4 grid gap-3 text-sm">
+              <li>
+                <a href={`mailto:${personalInfo.email}`} className="break-all text-muted transition-colors hover:text-accent">
+                  {personalInfo.email}
+                </a>
+              </li>
+              <li>
+                <a href={`tel:${personalInfo.phone}`} className="text-muted transition-colors hover:text-accent">
+                  {personalInfo.phoneDisplay}
+                </a>
+              </li>
+              <li className="text-muted">{personalInfo.location}</li>
+              <li>
+                <a href={personalInfo.resumeUrl} download className="text-accent transition-colors hover:underline">
+                  Download résumé (PDF)
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* oversized wordmark */}
+        <div aria-hidden className="pointer-events-none mt-12 select-none overflow-hidden">
+          <p className="h-display !text-[17vw] leading-[0.8] tracking-[-0.05em] text-transparent [-webkit-text-stroke:1px_rgb(var(--line))] opacity-90">
+            NADID
+          </p>
+        </div>
+
+        <div className="mt-8 flex flex-col items-start justify-between gap-4 border-t border-line/70 pt-6 sm:flex-row sm:items-center">
+          <p className="font-mono text-[11px] leading-relaxed text-faint">
+            © {year} {personalInfo.name}. All rights reserved.
+            <br className="sm:hidden" />
+            <span className="hidden sm:inline"> · </span>
+            Built with React, TypeScript & Tailwind — designed in Figma, shipped on Vercel.
+          </p>
+          <button
+            type="button"
+            onClick={() => window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' })}
+            className="group inline-flex items-center gap-2 rounded-full border border-line bg-surface/70 px-4 py-2 text-xs font-semibold text-muted transition-all hover:-translate-y-0.5 hover:border-accent/45 hover:text-accent"
+          >
+            Back to top
+            <FiArrowUp className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5" />
+          </button>
+        </div>
+      </div>
     </footer>
   )
 }
-
 
 export default Footer

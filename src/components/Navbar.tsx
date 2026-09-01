@@ -1,182 +1,239 @@
-import { useState, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { FiHome, FiCode, FiBookOpen, FiBriefcase, FiMail } from 'react-icons/fi'
-import ThemeToggle from './ThemeToggle'
+import { useEffect, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { FiArrowUpRight, FiDownload, FiMenu, FiX } from 'react-icons/fi'
+import ThemeToggle from './ui/ThemeToggle'
+import { navItems } from '../data/siteNav'
+import { personalInfo } from '../data/personalInfo'
+import { scrollToSection, useLockBodyScroll, useEscapeKey, useScrollProgress } from '../lib/utils'
 
-const navLinks = [
-  { name: 'Home', href: '#home', icon: FiHome },
-  { name: 'Projects', href: '#projects', icon: FiBriefcase },
-  { name: 'Skills', href: '#skills', icon: FiCode },
-  { name: 'Education', href: '#education', icon: FiBookOpen },
-  { name: 'Contact', href: '#contact', icon: FiMail },
-]
+const NAV_SECTION_IDS = ['home', ...navItems.map((n) => n.id)]
 
-const Navbar = () => {
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [activeSection, setActiveSection] = useState('home')
+export function Navbar() {
+  const [open, setOpen] = useState(false)
   const location = useLocation()
-  const isHomePage = location.pathname === '/'
+  const navigate = useNavigate()
+  const reduce = useReducedMotion()
+  const isHome = location.pathname === '/'
+  const { progress, scrolled } = useScrollProgress()
+  const [active, setActive] = useState('home')
 
-  // Scroll effect
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50)
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  useLockBodyScroll(open)
+  useEscapeKey(() => setOpen(false), open)
 
-  // Active section detection
+  /* Keep the highlighted item in sync with the section in view. */
   useEffect(() => {
-    if (!isHomePage) return
-    const handleScroll = () => {
-      for (const link of navLinks) {
-        const element = document.getElementById(link.href.replace('#', ''))
-        if (element) {
-          const rect = element.getBoundingClientRect()
-          if (rect.top <= 100 && rect.bottom >= 100) {
-            setActiveSection(link.href.replace('#', ''))
-            break
-          }
-        }
+    let frame = 0
+    const measure = () => {
+      frame = 0
+      if (!isHome) {
+        setActive('')
+        return
       }
+      let current = 'home'
+      for (const id of NAV_SECTION_IDS) {
+        const el = document.getElementById(id)
+        if (el && el.getBoundingClientRect().top <= 140) current = id
+      }
+      setActive(current)
     }
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [isHomePage])
+    const onScroll = () => {
+      if (!frame) frame = window.requestAnimationFrame(measure)
+    }
+    window.requestAnimationFrame(measure)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      if (frame) window.cancelAnimationFrame(frame)
+    }
+  }, [isHome])
 
-  // Scroll to section
-  const scrollToSection = (href: string) => {
-    const sectionId = href.replace('#', '')
-
-    if (!isHomePage) {
-      window.location.href = '/' + href
+  const goTo = (id: string) => {
+    setOpen(false)
+    if (!isHome) {
+      navigate('/')
+      window.setTimeout(() => scrollToSection(id), 260)
       return
     }
-
-    const element = document.getElementById(sectionId)
-    if (element) {
-      const navbarHeight = 80
-      const elementPosition = element.getBoundingClientRect().top
-      const offsetPosition = elementPosition + window.pageYOffset - navbarHeight
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      })
-    }
+    scrollToSection(id)
   }
 
   return (
     <>
-      {/* Main Navbar Header */}
-      <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled
-            ? 'bg-white/95 dark:bg-slate-950/95 backdrop-blur-md shadow-lg border-b border-slate-200 dark:border-slate-800'
-            : 'bg-white dark:bg-slate-950'
-        }`}
-      >
-        <nav className="container-custom">
-          <div className="flex items-center justify-between h-16 sm:h-20">
-            {/* Logo */}
-            <Link 
-              to="/" 
-              className="flex items-center gap-2 relative z-[60]"
-            >
-              <motion.div
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center shadow-lg shadow-cyan-500/25"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <span className="text-white font-bold text-base sm:text-lg">EN</span>
-              </motion.div>
-              <span className="text-lg sm:text-xl font-bold text-slate-800 dark:text-white hidden sm:block">
-                Nadid
-              </span>
-            </Link>
-
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-1 bg-slate-100 dark:bg-slate-800/50 p-1.5 rounded-2xl">
-              {navLinks.map((link) => {
-                const isActive = activeSection === link.href.replace('#', '') && isHomePage
-                return (
-                  <button
-                    key={link.name}
-                    onClick={() => scrollToSection(link.href)}
-                    className={`px-4 py-2 text-sm font-medium rounded-xl transition-all duration-300 ${
-                      isActive
-                        ? 'bg-white dark:bg-slate-700 text-cyan-600 dark:text-cyan-400 shadow-md'
-                        : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-slate-700/50'
-                    }`}
-                  >
-                    {link.name}
-                  </button>
-                )
-              })}
-            </div>
-
-            {/* Right Side - Theme Toggle */}
-            <div className="flex items-center gap-3 relative z-[60]">
-              <ThemeToggle />
-            </div>
-          </div>
-        </nav>
-      </header>
-
-      {/* Mobile Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 safe-area-bottom">
-        <nav className="flex items-center justify-around py-2 px-1">
-          {navLinks.map((link) => {
-            const isActive = activeSection === link.href.replace('#', '') && isHomePage
-            const Icon = link.icon
-            
-            return (
-              <motion.button
-                key={link.name}
-                onClick={() => scrollToSection(link.href)}
-                className={`flex flex-col items-center justify-center p-2 min-w-[56px] rounded-xl transition-all ${
-                  isActive
-                    ? 'text-cyan-600 dark:text-cyan-400'
-                    : 'text-slate-500 dark:text-slate-400'
-                }`}
-                whileTap={{ scale: 0.9 }}
-              >
-                <div className="relative">
-                  <Icon className={`w-5 h-5 transition-all ${
-                    isActive ? 'scale-110' : ''
-                  }`} />
-                  {isActive && (
-                    <motion.div
-                      layoutId="bottomNavIndicator"
-                      className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-cyan-500 rounded-full"
-                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                    />
-                  )}
-                </div>
-                <span className={`text-[10px] mt-1 font-medium ${
-                  isActive ? 'opacity-100' : 'opacity-70'
-                }`}>
-                  {link.name}
-                </span>
-              </motion.button>
-            )
-          })}
-        </nav>
+      {/* Scroll progress */}
+      <div aria-hidden className="fixed inset-x-0 top-0 z-[70] h-[2px] bg-transparent">
+        <div
+          className="h-full origin-left bg-gradient-to-r from-accent via-accent2 to-accent3 transition-transform duration-150"
+          style={{ transform: `scaleX(${progress})` }}
+        />
       </div>
 
-      {/* Global Styles for Bottom Nav Spacing */}
-      <style>
-        {`
-          @media (max-width: 1023px) {
-            body {
-              padding-bottom: 70px;
-            }
-          }
-          .safe-area-bottom {
-            padding-bottom: env(safe-area-inset-bottom);
-          }
-        `}
-      </style>
+      <motion.header
+        initial={{ y: reduce ? 0 : -28, opacity: reduce ? 1 : 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="fixed inset-x-0 top-0 z-[60] px-3 pt-3 sm:px-5 sm:pt-4"
+      >
+        <div
+          className={`mx-auto flex max-w-shell items-center justify-between gap-3 rounded-full border px-3 py-2 transition-all duration-500 sm:px-4 ${
+            scrolled
+              ? 'border-line bg-surface/80 shadow-[0_18px_50px_-30px_rgb(3_5_18/0.7)] backdrop-blur-xl'
+              : 'border-transparent bg-transparent'
+          }`}
+        >
+          {/* Logo */}
+          <Link
+            to="/"
+            onClick={(e) => {
+              if (isHome) {
+                e.preventDefault()
+                goTo('home')
+              }
+            }}
+            className="group flex items-center gap-2.5 pl-1"
+            aria-label={`${personalInfo.name} — home`}
+          >
+            <span className="relative grid h-9 w-9 place-items-center overflow-hidden rounded-[13px] bg-gradient-to-br from-accent via-accent2 to-accent3 text-[13px] font-bold text-white shadow-[0_10px_28px_-12px_rgb(var(--accent-2)/0.9)]">
+              <span className="relative z-10 font-display">{personalInfo.initials}</span>
+              <span className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-[linear-gradient(120deg,transparent_20%,rgb(255_255_255/0.45)_50%,transparent_80%)]" />
+            </span>
+            <span className="hidden leading-tight sm:block">
+              <span className="block font-display text-[15px] font-semibold tracking-tight">Nadid</span>
+              <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-faint">
+                design · code
+              </span>
+            </span>
+          </Link>
+
+          {/* Desktop links */}
+          <nav className="hidden items-center gap-0.5 rounded-full border border-line bg-surface2/60 p-1 lg:flex">
+            {navItems.map((item) => {
+              const isActive = isHome && active === item.id
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => goTo(item.id)}
+                  className={`relative rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors duration-300 ${
+                    isActive ? 'text-fg' : 'text-muted hover:text-fg'
+                  }`}
+                >
+                  {isActive && (
+                    <motion.span
+                      layoutId="nav-pill"
+                      transition={{ type: 'spring', stiffness: 420, damping: 34 }}
+                      className="absolute inset-0 -z-10 rounded-full border border-line bg-surface shadow-sm"
+                    />
+                  )}
+                  {item.label}
+                </button>
+              )
+            })}
+          </nav>
+
+          {/* Actions */}
+          <div className="flex items-center gap-2">
+            <a
+              href={personalInfo.resumeUrl}
+              download
+              className="btn btn-ghost hidden !px-4 !py-2 text-[13px] md:inline-flex"
+            >
+              <FiDownload className="h-4 w-4" />
+              Résumé
+            </a>
+            <ThemeToggle />
+            <button
+              type="button"
+              onClick={() => setOpen((v) => !v)}
+              className="relative grid h-10 w-10 place-items-center rounded-full border border-line bg-surface/70 text-fg transition-colors hover:border-accent/50 lg:hidden"
+              aria-expanded={open}
+              aria-label={open ? 'Close menu' : 'Open menu'}
+            >
+              <AnimatePresence initial={false} mode="popLayout">
+                <motion.span
+                  key={open ? 'close' : 'menu'}
+                  initial={{ rotate: -30, opacity: 0, scale: 0.7 }}
+                  animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                  exit={{ rotate: 30, opacity: 0, scale: 0.7 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute inset-0 grid place-items-center"
+                >
+                  {open ? <FiX className="h-5 w-5" /> : <FiMenu className="h-5 w-5" />}
+                </motion.span>
+              </AnimatePresence>
+            </button>
+          </div>
+        </div>
+      </motion.header>
+
+      {/* Mobile sheet */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-[55] lg:hidden"
+          >
+            <div
+              className="absolute inset-0 bg-canvas/85 backdrop-blur-xl"
+              onClick={() => setOpen(false)}
+              aria-hidden
+            />
+            <motion.nav
+              initial={{ y: -18, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -14, opacity: 0 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="relative mx-3 mt-20 overflow-hidden rounded-3xl border border-line bg-surface/95 p-5 shadow-panel sm:mx-5"
+            >
+              <span className="hairline-top" aria-hidden />
+              <ul className="divide-y divide-line/70">
+                {navItems.map((item, i) => (
+                  <motion.li
+                    key={item.id}
+                    initial={{ opacity: 0, x: -14 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.06 + i * 0.05, duration: 0.4 }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => goTo(item.id)}
+                      className="flex w-full items-center justify-between gap-4 py-3.5 text-left"
+                    >
+                      <span className="flex items-baseline gap-3">
+                        <span className="font-mono text-[11px] text-faint">0{i + 1}</span>
+                        <span className="font-display text-xl font-semibold tracking-tight">{item.label}</span>
+                      </span>
+                      <span className="flex items-center gap-2 text-xs text-muted">
+                        {item.hint}
+                        <FiArrowUpRight className="h-4 w-4 text-accent" />
+                      </span>
+                    </button>
+                  </motion.li>
+                ))}
+              </ul>
+
+              <div className="mt-5 grid grid-cols-2 gap-2">
+                <a
+                  href={personalInfo.resumeUrl}
+                  download
+                  className="btn btn-ghost w-full !py-2.5 text-[13px]"
+                >
+                  <FiDownload className="h-4 w-4" />
+                  Résumé
+                </a>
+                <button type="button" onClick={() => goTo('contact')} className="btn btn-solid w-full !py-2.5 text-[13px]">
+                  Hire me
+                  <FiArrowUpRight className="h-4 w-4" />
+                </button>
+              </div>
+              <p className="mt-4 text-center font-mono text-[11px] text-faint">{personalInfo.email}</p>
+            </motion.nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 }

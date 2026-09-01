@@ -1,74 +1,82 @@
-# React + TypeScript + Vite
+# Emamul Islam Nadid — Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A single-page portfolio for a graphic designer / web developer: brand identity work, case studies,
+skills, timeline and a working contact form. Dark-first design system with a fully considered light
+theme, self-hosted variable fonts, WebP imagery and reduced-motion support.
 
-Currently, two official plugins are available:
+**Live:** https://einadid.vercel.app
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Stack
 
-## React Compiler
+| Layer     | Choice                                                        |
+| --------- | ------------------------------------------------------------- |
+| Framework | React 19 + TypeScript (strict) + Vite 7                       |
+| Styling   | Tailwind CSS 3 driven by CSS custom properties (design tokens) |
+| Motion    | Framer Motion, all scroll reveals respect `prefers-reduced-motion` |
+| Routing   | React Router 7 (`/`, `/projects`, `/projects/:id`)            |
+| Type      | Sora, Inter and JetBrains Mono — self-hosted via Fontsource   |
+| Forms     | EmailJS (`@emailjs/browser`)                                    |
+| Hosting   | Vercel (`vercel.json` handles SPA rewrites + cache/security headers) |
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Getting started
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev        # http://localhost:5173
+npm run build      # tsc -b && vite build → dist/
+npm run preview    # serve the production build
+npm run lint       # eslint
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Editing content
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Everything the site prints comes from `src/data`:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- `personalInfo.ts` — name, tagline, bio, contact details, socials
+- `projects.ts` — case studies (`status: 'live' | 'progress'`; `featured` projects sort first)
+- `services.ts` — service list + the 4-step process
+- `skills.ts` — skill categories, toolbelt chips, hero marquee, hero stats
+- `education.ts`, `experience.ts`, `certificates.ts` — the Journey timeline
+- `siteNav.ts` — the nav items used by the header and the footer
+
+Add a project = add an object to `projects.ts` and drop images in `public/projects/<id>/`. Nothing
+else needs to change; the archive page, sitemap generator input, filters and counts are derived.
+
+## Design tokens
+
+Colours, fonts, shadows and animations live in `tailwind.config.js`; the actual values are CSS
+variables in `src/index.css` (`:root` for light, `.dark` for dark). Add a token there once and both
+themes update. Reusable classes (`.panel`, `.btn-solid`, `.chip`, `.spot`, `.h-section`, `.field`)
+are defined in the same file.
+
+## Performance notes
+
+- Every raster asset is WebP, generated from the originals in `design-source/originals/`.
+- Fonts are local (`@fontsource-variable/*`) — no third-party requests, no layout shift.
+- Images use `loading="lazy"` + explicit aspect ratios; the hero portrait is `fetchpriority="high"`.
+- Vendor code splits into `react` / `motion` chunks for long-term caching.
+
+## Contact form
+
+Service/template/public key are hard-coded with an env override:
+
+```bash
+# .env.local
+VITE_EMAILJS_SERVICE_ID=...
+VITE_EMAILJS_TEMPLATE_ID=...
+VITE_EMAILJS_PUBLIC_KEY=...
 ```
-# my-portfolio
+
+Template variables expected by EmailJS: `from_name`, `from_email`, `subject`, `message`, `interest`.
+
+## Repo layout
+
+```
+src/
+  components/     UI sections (Hero, Projects, Services, Skills, Journey, About, Contact, Footer)
+  components/ui/   Primitives: Reveal, SectionHeading, Marquee, SmartImage, Backdrop, ThemeToggle…
+  data/            All editable content (edit here, not in components)
+  lib/             hooks + helpers (scroll progress, spotlight, copy, escape, body-lock)
+public/            served assets: WebP images, resume.pdf, og-image.jpg, favicon, sitemap
+design-source/     heavy original JPG/PNG exports — never served, kept for re-exporting
+```
