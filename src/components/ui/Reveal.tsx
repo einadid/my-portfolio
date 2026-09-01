@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
-import { fadeUp, stagger } from '../../lib/motion'
+import { easeOut, fadeUp, stagger } from '../../lib/motion'
 
 interface RevealProps {
   children: ReactNode
@@ -26,7 +26,7 @@ export function Reveal({ children, className, delay = 0, group = false, amount =
       initial="hidden"
       whileInView="show"
       viewport={{ once: true, amount }}
-      transition={group ? undefined : { delay }}
+      transition={group ? undefined : { delay, duration: 0.7, ease: easeOut }}
     >
       {children}
     </motion.div>
