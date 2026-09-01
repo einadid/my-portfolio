@@ -1,212 +1,120 @@
 import { motion } from 'framer-motion'
-import { FiMapPin, FiMail, FiPhone, FiCalendar, FiCode, FiHeart, FiTarget, FiUser, FiDownload } from 'react-icons/fi'
+import { FiArrowUpRight, FiDownload, FiGithub, FiLinkedin, FiYoutube } from 'react-icons/fi'
+import { SectionHeading } from './ui/SectionHeading'
+import { Reveal } from './ui/Reveal'
+import { SmartImage, MonogramFallback } from './ui/SmartImage'
 import { personalInfo } from '../data/personalInfo'
-import { projects } from '../data/projects'
 
-const About = () => {
-  const infoCards = [
-    { icon: FiMapPin, label: 'Location', value: personalInfo.location, color: 'text-red-500' },
-    { icon: FiMail, label: 'Email', value: personalInfo.email, color: 'text-cyan-500', href: `mailto:${personalInfo.email}` },
-    { icon: FiPhone, label: 'Phone', value: personalInfo.phone, color: 'text-green-500', href: `tel:${personalInfo.phone}` },
-    { icon: FiCalendar, label: 'Date of Birth', value: personalInfo.dob, color: 'text-purple-500' }
-  ]
+const facts = [
+  { label: 'Based in', value: personalInfo.location },
+  { label: 'Experience', value: `${new Date().getFullYear() - 2021}+ years, freelance` },
+  { label: 'Studying', value: 'B.Sc. in CSE · Port City Intl. University' },
+  { label: 'Languages', value: personalInfo.about.languages.join(' · ') },
+]
 
-  const aboutCards = [
-    { icon: FiCode, title: 'My Journey', description: personalInfo.about.journey, color: 'from-cyan-500 to-blue-500' },
-    { icon: FiTarget, title: 'What I Enjoy', description: personalInfo.about.workEnjoy, color: 'from-purple-500 to-pink-500' },
-    { icon: FiHeart, title: 'Hobbies & Interests', description: personalInfo.about.hobbies, color: 'from-orange-500 to-red-500' }
-  ]
+const chapters = [
+  { title: 'How I got here', text: personalInfo.about.journey },
+  { title: 'What I like to work on', text: personalInfo.about.workEnjoy },
+  { title: 'Off the clock', text: personalInfo.about.hobbies },
+]
 
+export function About() {
   return (
-    <section id="about" className="section-padding bg-slate-50 dark:bg-slate-900/50">
-      <div className="container-custom">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-16"
-        >
-          <h2 className="section-title">About Me</h2>
-          <p className="section-subtitle">Get to know me better</p>
-        </motion.div>
+    <section id="about" className="section">
+      <div className="shell">
+        <SectionHeading
+          kicker="About"
+          title="Designer who codes, developer who kerning-checks."
+          description={personalInfo.about.intro}
+        />
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Left Column - Main Content */}
-          <motion.div
-            className="lg:col-span-2 space-y-6"
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            {/* Who Am I Card */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="card p-6 md:p-8"
-            >
-              <div className="flex items-start gap-4 mb-6">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center flex-shrink-0">
-                  <FiUser className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Who Am I?</h3>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">A little introduction about myself</p>
-                </div>
-              </div>
-              <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-base md:text-lg text-justify">
-                {personalInfo.shortBio}
-              </p>
-            </motion.div>
-
-            {/* About Cards Grid */}
-            <div className="grid sm:grid-cols-1 gap-6">
-              {aboutCards.map((card, idx) => (
-                <motion.div
-                  key={card.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: idx * 0.1 }}
-                  className="card p-6 group hover:shadow-lg transition-all duration-300"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${card.color} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300`}>
-                      <card.icon className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{card.title}</h3>
-                      <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-justify">
-                        {card.description}
-                      </p>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Right Column - Sidebar */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="lg:col-span-1 space-y-4"
-          >
-            {/* Profile Card */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="card p-6 text-center"
-            >
-              <div className="w-24 h-24 mx-auto rounded-full overflow-hidden border-4 border-cyan-500/20 mb-4">
-                <img
-                  src="/profile.jpg"
-                  alt={personalInfo.name}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement
-                    target.style.display = 'none'
-                    if (target.parentElement) {
-                      target.parentElement.innerHTML = `
-                        <div class="w-full h-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center">
-                          <span class="text-2xl font-bold text-white">EN</span>
-                        </div>
-                      `
-                    }
-                  }}
+        <div className="mt-14 grid gap-6 lg:grid-cols-12 lg:gap-10">
+          {/* portrait */}
+          <Reveal className="lg:col-span-5">
+            <div className="group relative">
+              <div className="panel overflow-hidden p-2.5">
+                <SmartImage
+                  src="/about-portrait.webp"
+                  alt={`${personalInfo.name} in a formal portrait`}
+                  className="aspect-4/5 w-full rounded-[1.35rem]"
+                  imgClassName="transition-transform duration-[1.4s] ease-out group-hover:scale-[1.03]"
+                  fallback={<MonogramFallback label={personalInfo.name} />}
                 />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">
-                {personalInfo.name}
-              </h3>
-              <p className="text-cyan-500 font-medium mb-4">
-                {personalInfo.designation}
-              </p>
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-200 dark:border-slate-700">
-                <div>
-                  <p className="text-2xl font-bold text-cyan-500">3+</p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Years Exp.</p>
+
+              {/* caption plate */}
+              <div className="panel absolute -bottom-5 left-4 right-4 flex items-center justify-between gap-3 px-4 py-3 sm:left-6 sm:right-6">
+                <div className="min-w-0">
+                  <p className="truncate font-display text-sm font-semibold">Chattogram, Bangladesh</p>
+                  <p className="truncate font-mono text-[10px] uppercase tracking-[0.16em] text-faint">
+                    working with clients worldwide
+                  </p>
                 </div>
-                <div>
-                  <p className="text-2xl font-bold text-cyan-500">{projects.length}</p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Projects</p>
-                </div>
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-accent to-accent3 text-white">
+                  <FiArrowUpRight className="h-4 w-4" />
+                </span>
               </div>
-            </motion.div>
 
-            {/* Info Cards */}
-            {infoCards.map((info, idx) => (
-              <motion.div
-                key={info.label}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className="card p-4 group hover:shadow-md transition-all duration-300"
+              <motion.span
+                aria-hidden
+                animate={{ y: [0, -8, 0] }}
+                transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+                className="absolute -left-3 top-8 hidden rounded-2xl border border-line bg-surface/90 px-3 py-2 shadow-panel backdrop-blur-xl sm:block"
               >
-                {info.href ? (
-                  <a href={info.href} className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center ${info.color} group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}>
-                      <info.icon className="w-5 h-5" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-                        {info.label}
-                      </p>
-                      <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
-                        {info.value}
-                      </p>
-                    </div>
-                  </a>
-                ) : (
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center ${info.color} flex-shrink-0`}>
-                      <info.icon className="w-5 h-5" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-                        {info.label}
-                      </p>
-                      <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
-                        {info.value}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </motion.div>
-            ))}
+                <span className="block font-mono text-[10px] uppercase tracking-[0.14em] text-faint">Since</span>
+                <span className="block font-display text-sm font-semibold text-accent">2021</span>
+              </motion.span>
+            </div>
+          </Reveal>
 
-            {/* CTA Card */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="card p-6 bg-gradient-to-br from-cyan-500 to-blue-600 border-0"
-            >
-              <div className="text-center text-white">
-                <h4 className="font-bold text-lg mb-2">Want to know more?</h4>
-                <p className="text-cyan-100 text-sm mb-4">
-                  Download my resume for detailed information
-                </p>
-                <a
-                  href={personalInfo.resumeUrl}
-                  download
-                  className="inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-white text-cyan-600 rounded-lg font-medium hover:bg-cyan-50 transition-colors w-full"
-                >
-                  <FiDownload className="w-4 h-4" />
-                  Download CV
+          {/* chapters + facts */}
+          <Reveal className="lg:col-span-7" delay={0.1}>
+            <div className="grid gap-5">
+              {chapters.map((chapter, i) => (
+                <div key={chapter.title} className="panel spot p-5 sm:p-6">
+                  <div className="flex items-baseline gap-3">
+                    <span className="font-mono text-[11px] text-faint">0{i + 1}</span>
+                    <h3 className="h-card">{chapter.title}</h3>
+                  </div>
+                  <p className="mt-2.5 text-[15px] leading-relaxed text-muted">{chapter.text}</p>
+                </div>
+              ))}
+
+              <div className="panel-flat grid grid-cols-2 divide-x divide-y divide-line/70 overflow-hidden">
+                {facts.map((fact) => (
+                  <div key={fact.label} className="p-4">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-faint">{fact.label}</p>
+                    <p className="mt-1 text-sm font-medium leading-snug text-fg">{fact.value}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-4 pt-1">
+                <div className="flex gap-2">
+                  {[
+                    { label: 'GitHub', href: personalInfo.github, Icon: FiGithub },
+                    { label: 'LinkedIn', href: personalInfo.linkedin, Icon: FiLinkedin },
+                    { label: 'YouTube', href: personalInfo.youtube, Icon: FiYoutube },
+                  ].map(({ label, href, Icon }) => (
+                    <a
+                      key={label}
+                      href={href}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      aria-label={label}
+                      className="icon-btn"
+                    >
+                      <Icon className="h-4 w-4" />
+                    </a>
+                  ))}
+                </div>
+                <a href={personalInfo.resumeUrl} download className="btn btn-solid">
+                  <FiDownload className="h-4 w-4" />
+                  Download résumé
                 </a>
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </Reveal>
         </div>
       </div>
     </section>

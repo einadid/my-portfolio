@@ -1,316 +1,331 @@
-import { useState, useRef } from 'react'
-import { motion } from 'framer-motion'
+import { useRef, useState } from 'react'
 import emailjs from '@emailjs/browser'
-import { 
-  FiMail, 
-  FiPhone, 
-  FiMapPin, 
-  FiSend,
-  FiUser,
-  FiMessageSquare,
+import { motion } from 'framer-motion'
+import {
+  FiAlertCircle,
+  FiArrowUpRight,
+  FiCheckCircle,
+  FiClock,
+  FiCopy,
   FiGithub,
   FiLinkedin,
+  FiLoader,
+  FiMail,
+  FiMapPin,
+  FiPhoneCall,
+  FiSend,
   FiYoutube,
-  FiCheckCircle,
-  FiAlertCircle
 } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
+import { SectionHeading } from './ui/SectionHeading'
+import { Reveal } from './ui/Reveal'
 import { personalInfo } from '../data/personalInfo'
+import { useCopy } from '../lib/utils'
 
-const Contact = () => {
+const EMAILJS = {
+  serviceId: import.meta.env.VITE_EMAILJS_SERVICE_ID ?? 'service_txbtksp',
+  templateId: import.meta.env.VITE_EMAILJS_TEMPLATE_ID ?? 'template_evg46x1',
+  publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY ?? 'E_drX_54q2yI762gs',
+}
+
+const channels = [
+  {
+    key: 'email',
+    label: 'Email',
+    value: personalInfo.email,
+    href: `mailto:${personalInfo.email}`,
+    Icon: FiMail,
+    copy: personalInfo.email,
+  },
+  {
+    key: 'whatsapp',
+    label: 'WhatsApp',
+    value: personalInfo.phoneDisplay,
+    href: `https://wa.me/${personalInfo.whatsapp.replace(/\D/g, '')}`,
+    Icon: FaWhatsapp,
+    copy: personalInfo.whatsapp,
+  },
+  {
+    key: 'phone',
+    label: 'Phone',
+    value: personalInfo.phoneDisplay,
+    href: `tel:${personalInfo.phone}`,
+    Icon: FiPhoneCall,
+    copy: personalInfo.phone,
+  },
+  {
+    key: 'location',
+    label: 'Location',
+    value: personalInfo.location,
+    href: 'https://maps.google.com/?q=South+Khulshi,+Chattogram',
+    Icon: FiMapPin,
+  },
+]
+
+const socials = [
+  { label: 'GitHub', href: personalInfo.github, Icon: FiGithub },
+  { label: 'LinkedIn', href: personalInfo.linkedin, Icon: FiLinkedin },
+  { label: 'YouTube', href: personalInfo.youtube, Icon: FiYoutube },
+]
+
+export function Contact() {
   const formRef = useRef<HTMLFormElement>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
+  const { copied, copy } = useCopy()
 
-  // Contact info cards
-  const contactInfo = [
-    {
-      icon: FiMail,
-      label: 'Email',
-      value: personalInfo.email,
-      href: `mailto:${personalInfo.email}`,
-      color: 'from-red-500 to-orange-500'
-    },
-    {
-      icon: FiPhone,
-      label: 'Phone',
-      value: personalInfo.phone,
-      href: `tel:${personalInfo.phone}`,
-      color: 'from-green-500 to-emerald-500'
-    },
-    {
-      icon: FaWhatsapp,
-      label: 'WhatsApp',
-      value: personalInfo.whatsapp,
-      href: `https://wa.me/${personalInfo.whatsapp.replace(/[^0-9]/g, '')}`,
-      color: 'from-green-400 to-green-600'
-    },
-    {
-      icon: FiMapPin,
-      label: 'Location',
-      value: personalInfo.location,
-      href: '#',
-      color: 'from-blue-500 to-cyan-500'
-    }
-  ]
-
-  // Social links
-  const socialLinks = [
-    { icon: FiGithub, href: personalInfo.github, label: 'GitHub' },
-    { icon: FiLinkedin, href: personalInfo.linkedin, label: 'LinkedIn' },
-    { icon: FiYoutube, href: personalInfo.youtube, label: 'YouTube' },
-  ]
-
-  // Handle form submit with EmailJS
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setIsSubmitting(true)
-    setSubmitStatus('idle')
-
+    if (!formRef.current) return
+    setStatus('sending')
     try {
-      // EmailJS configuration - তোমার credentials দাও এখানে
-      const result = await emailjs.sendForm(
-        'service_txbtksp',      // তোমার Service ID
-        'template_evg46x1',     // তোমার Template ID
-        formRef.current!,
-        'E_drX_54q2yI762gs'       // তোমার Public Key
-      )
-
-      console.log('Email sent successfully:', result.text)
-      setSubmitStatus('success')
-      formRef.current?.reset()
-
-      setTimeout(() => setSubmitStatus('idle'), 5000)
-
-    } catch (error) {
-      console.error('Email send failed:', error)
-      setSubmitStatus('error')
-      setTimeout(() => setSubmitStatus('idle'), 5000)
+      await emailjs.sendForm(EMAILJS.serviceId, EMAILJS.templateId, formRef.current, {
+        publicKey: EMAILJS.publicKey,
+      })
+      setStatus('success')
+      formRef.current.reset()
+    } catch {
+      setStatus('error')
     } finally {
-      setIsSubmitting(false)
+      window.setTimeout(() => setStatus((s) => (s === 'idle' ? s : 'idle')), 6000)
     }
-  }
-
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
-  }
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
   }
 
   return (
-    <section id="contact" className="section-padding bg-slate-50 dark:bg-slate-900/50">
-      <div className="container-custom">
-        {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-12"
-        >
-          <h2 className="section-title">Contact Me</h2>
-          <p className="section-subtitle">Let's get in touch and work together</p>
-        </motion.div>
+    <section id="contact" className="section">
+      <div className="shell">
+        <SectionHeading
+          kicker="Contact"
+          title={
+            <>
+              Got a brief?
+              <br className="hidden sm:block" /> Send it over — I read everything.
+            </>
+          }
+          description="Design work, a frontend build, or a rough idea you can’t yet describe. Tell me the goal and the deadline, and I’ll tell you honestly whether I’m the right person."
+          aside={
+            <div className="panel-flat inline-flex items-center gap-2.5 px-4 py-2.5">
+              <FiClock className="h-4 w-4 text-accent" />
+              <span className="text-[13px] text-muted">
+                Replies in <span className="font-semibold text-fg">under 24h</span> · GMT+6
+              </span>
+            </div>
+          }
+        />
 
-        <div className="grid lg:grid-cols-2 gap-12">
-          {/* Left Side - Contact Info */}
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            {/* Intro Text */}
-            <motion.div variants={itemVariants} className="mb-8">
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
-                Let's Talk! 👋
-              </h3>
-              <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-justify">
-                I'm always open to discussing new projects, creative ideas, or opportunities to be part of your vision. 
-                Feel free to reach out through any of the following channels.
-              </p>
-            </motion.div>
-
-            {/* Contact Info Cards */}
-            <motion.div variants={itemVariants} className="grid sm:grid-cols-2 gap-4 mb-8">
-              {contactInfo.map((info) => (
-                <a
-                  key={info.label}
-                  href={info.href}
-                  target={info.href.startsWith('http') ? '_blank' : undefined}
-                  rel={info.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                  className="card p-4 group hover:shadow-lg transition-all duration-300"
+        <div className="mt-12 grid gap-5 lg:grid-cols-12">
+          {/* channels */}
+          <Reveal className="lg:col-span-5">
+            <div className="flex h-full flex-col gap-3">
+              {channels.map(({ key, label, value, href, Icon, copy: copyValue }) => (
+                <div
+                  key={key}
+                  className="panel spot group flex items-center gap-4 p-4 transition-all duration-500 hover:-translate-y-0.5 hover:border-accent/30"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${info.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-                      <info.icon className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">
-                        {info.label}
-                      </p>
-                      <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
-                        {info.value}
-                      </p>
-                    </div>
+                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-line bg-surface2/70 text-accent transition-colors group-hover:border-accent/40">
+                    <Icon className="h-4 w-4" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-faint">{label}</p>
+                    <a href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noreferrer noopener" className="block truncate text-sm font-medium text-fg hover:text-accent">
+                      {value}
+                    </a>
                   </div>
-                </a>
+                  {copyValue && (
+                    <button
+                      type="button"
+                      onClick={() => copy(copyValue)}
+                      className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-line text-faint transition-colors hover:border-accent/40 hover:text-accent"
+                      aria-label={`Copy ${label.toLowerCase()}`}
+                    >
+                      {copied === copyValue ? (
+                        <FiCheckCircle className="h-4 w-4 text-accent" />
+                      ) : (
+                        <FiCopy className="h-4 w-4" />
+                      )}
+                    </button>
+                  )}
+                </div>
               ))}
-            </motion.div>
 
-            {/* Social Links */}
-            <motion.div variants={itemVariants}>
-              <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-                Follow Me
-              </h4>
-              <div className="flex gap-3">
-                {socialLinks.map((social) => (
-                  <a
-                    key={social.label}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-12 h-12 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:text-cyan-500 hover:border-cyan-500 dark:hover:border-cyan-500 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
-                    title={social.label}
-                  >
-                    <social.icon className="w-5 h-5" />
-                  </a>
+              <div className="panel mt-auto overflow-hidden">
+                <div className="relative p-5">
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_100%_at_0%_0%,rgb(var(--accent)/0.14),transparent_60%)]"
+                  />
+                  <p className="relative font-display text-lg font-semibold">Prefer to talk it through?</p>
+                  <p className="relative mt-1.5 text-sm text-muted">
+                    Book a 20-minute call — I’ll bring questions, a rough scope and an honest estimate.
+                  </p>
+                  <div className="relative mt-4 flex flex-wrap gap-2">
+                    <a
+                      href={`https://wa.me/${personalInfo.whatsapp.replace(/\D/g, '')}`}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="btn btn-solid !py-2.5 text-[13px]"
+                    >
+                      <FaWhatsapp className="h-4 w-4" />
+                      WhatsApp me
+                    </a>
+                    <a
+                      href={`mailto:${personalInfo.email}?subject=Project%20enquiry&body=Hi%20Nadid%2C%0A%0AI%20have%20a%20project%20I%27d%20like%20to%20discuss%3A%0A`}
+                      className="btn btn-ghost !py-2.5 text-[13px]"
+                    >
+                      Email a brief
+                      <FiArrowUpRight className="h-4 w-4" />
+                    </a>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between gap-3 border-t border-line/70 bg-surface2/40 px-5 py-3">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-faint">Elsewhere</span>
+                  <div className="flex gap-1.5">
+                    {socials.map(({ label, href, Icon }) => (
+                      <a
+                        key={label}
+                        href={href}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        aria-label={label}
+                        className="grid h-9 w-9 place-items-center rounded-lg border border-line text-muted transition-all hover:-translate-y-0.5 hover:border-accent/40 hover:text-accent"
+                      >
+                        <Icon className="h-4 w-4" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Reveal>
+
+          {/* form */}
+          <Reveal className="lg:col-span-7" delay={0.12}>
+            <motion.form
+              ref={formRef}
+              onSubmit={handleSubmit}
+              className="panel h-full p-5 sm:p-7"
+              initial={false}
+            >
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h3 className="h-card text-xl">Project enquiry</h3>
+                <span className="chip">
+                  <span className="dot bg-accent" aria-hidden />
+                  secure · no spam
+                </span>
+              </div>
+
+              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                <div className="field-wrap">
+                  <input id="from_name" name="from_name" required placeholder=" " className="field peer" autoComplete="name" />
+                  <label htmlFor="from_name" className="field-label">
+                    Your name
+                  </label>
+                </div>
+                <div className="field-wrap">
+                  <input
+                    id="from_email"
+                    name="from_email"
+                    type="email"
+                    required
+                    placeholder=" "
+                    className="field peer"
+                    autoComplete="email"
+                  />
+                  <label htmlFor="from_email" className="field-label">
+                    Email address
+                  </label>
+                </div>
+              </div>
+
+              <div className="field-wrap mt-4">
+                <input id="subject" name="subject" required placeholder=" " className="field peer" />
+                <label htmlFor="subject" className="field-label">
+                  What is it about? (brand, website, both…)
+                </label>
+              </div>
+
+              <div className="field-wrap mt-4">
+                <textarea
+                  id="message"
+                  name="message"
+                  required
+                  rows={6}
+                  placeholder=" "
+                  className="peer w-full resize-y rounded-xl border border-line bg-surface2/40 px-4 pb-3 pt-7 text-sm text-fg outline-none transition-all duration-300 focus:border-accent/50 focus:bg-surface"
+                />
+                <label htmlFor="message" className="field-label">
+                  Brief, budget range and deadline
+                </label>
+              </div>
+
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                {['Logo & brand', 'Social media kit', 'Landing page', 'Full web app'].map((tag) => (
+                  <label key={tag} className="chip cursor-pointer transition-colors hover:border-accent/40 hover:text-fg">
+                    <input
+                      type="checkbox"
+                      name="interest"
+                      value={tag}
+                      className="peer sr-only"
+                      onChange={(e) => {
+                        const el = e.currentTarget.closest('label')
+                        el?.classList.toggle('border-accent/50', e.currentTarget.checked)
+                        el?.classList.toggle('text-accent', e.currentTarget.checked)
+                      }}
+                    />
+                    {tag}
+                  </label>
                 ))}
               </div>
-            </motion.div>
-          </motion.div>
 
-          {/* Right Side - Contact Form */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <div className="card p-6 md:p-8">
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
-                Send Me a Message
-              </h3>
-
-              {/* Success Message */}
-              {submitStatus === 'success' && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
+              {status === 'success' && (
+                <motion.p
+                  role="status"
+                  aria-live="polite"
+                  initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mb-6 p-4 bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-xl flex items-center gap-3"
+                  className="mt-5 flex items-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-4 py-3 text-sm text-accent"
                 >
-                  <FiCheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
-                  <p className="text-green-700 dark:text-green-400 font-medium">
-                    Message sent successfully! I'll get back to you soon.
-                  </p>
-                </motion.div>
+                  <FiCheckCircle className="h-4 w-4 shrink-0" />
+                  Sent — thanks! Your message is in my inbox. I’ll reply within a day.
+                </motion.p>
               )}
 
-              {/* Error Message */}
-              {submitStatus === 'error' && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
+              {status === 'error' && (
+                <motion.p
+                  role="alert"
+                  aria-live="assertive"
+                  initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mb-6 p-4 bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl flex items-center gap-3"
+                  className="mt-5 flex flex-wrap items-center gap-2 rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-500"
                 >
-                  <FiAlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
-                  <p className="text-red-700 dark:text-red-400 font-medium">
-                    Failed to send. Please email me directly.
-                  </p>
-                </motion.div>
+                  <FiAlertCircle className="h-4 w-4 shrink-0" />
+                  Something blocked the send. Reach me directly at{' '}
+                  <a href={`mailto:${personalInfo.email}`} className="underline">
+                    {personalInfo.email}
+                  </a>
+                  .
+                </motion.p>
               )}
 
-              <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
-                {/* Name Field - IMPORTANT: name="from_name" */}
-                <div>
-                  <label htmlFor="from_name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                    Your Name
-                  </label>
-                  <div className="relative">
-                    <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    <input
-                      type="text"
-                      id="from_name"
-                      name="from_name"
-                      required
-                      placeholder="John Doe"
-                      className="input-field pl-12"
-                    />
-                  </div>
-                </div>
-
-                {/* Email Field - IMPORTANT: name="from_email" */}
-                <div>
-                  <label htmlFor="from_email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                    Your Email
-                  </label>
-                  <div className="relative">
-                    <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    <input
-                      type="email"
-                      id="from_email"
-                      name="from_email"
-                      required
-                      placeholder="john@example.com"
-                      className="input-field pl-12"
-                    />
-                  </div>
-                </div>
-
-                {/* Message Field - IMPORTANT: name="message" */}
-                <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                    Your Message
-                  </label>
-                  <div className="relative">
-                    <FiMessageSquare className="absolute left-4 top-4 w-5 h-5 text-slate-400" />
-                    <textarea
-                      id="message"
-                      name="message"
-                      required
-                      rows={5}
-                      placeholder="Hi, I'd like to discuss a project..."
-                      className="input-field pl-12 resize-none"
-                    />
-                  </div>
-                </div>
-
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full btn-primary disabled:opacity-70 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? (
+              <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-line/70 pt-5">
+                <p className="max-w-xs text-xs leading-relaxed text-faint">
+                  Your details are only used to answer your enquiry. No lists, no tracking.
+                </p>
+                <button type="submit" disabled={status === 'sending'} className="btn btn-solid min-w-[11rem]">
+                  {status === 'sending' ? (
                     <>
-                      <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                      </svg>
-                      Sending...
+                      <FiLoader className="h-4 w-4 animate-spin" />
+                      Sending…
                     </>
                   ) : (
                     <>
-                      <FiSend className="w-5 h-5" />
-                      Send Message
+                      <FiSend className="h-4 w-4" />
+                      Send message
                     </>
                   )}
                 </button>
-              </form>
-
-              <p className="mt-4 text-xs text-slate-500 dark:text-slate-400 text-center">
-                I usually respond within 24 hours
-              </p>
-            </div>
-          </motion.div>
+              </div>
+            </motion.form>
+          </Reveal>
         </div>
       </div>
     </section>
